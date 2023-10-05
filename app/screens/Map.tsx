@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { View, StyleSheet, Text } from 'react-native';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import { DocumentData, collection, doc, getDocs } from "firebase/firestore"; 
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import * as Location from 'expo-location';
+import CustomCallout from '../components/CustomCallout';
 
 interface MarkerData {
   id: string;
@@ -70,14 +71,14 @@ export default function Map() {
       {userLocation &&
       <MapView style={styles.map} initialRegion={{ latitude: userLocation.latitude, longitude: userLocation.longitude, latitudeDelta: 0.1, longitudeDelta: 0.1 }}>
         {/* user marker */}
-        <Marker
+        {/* <Marker
             coordinate={{
               latitude: userLocation.latitude,
               longitude: userLocation.longitude,
             }}
             title="Your Location"
             pinColor="blue"
-          />
+          /> */}
         {markers.map((marker) => (
           <Marker
             key={marker.id}
@@ -85,7 +86,11 @@ export default function Map() {
             title={marker.name}
             description={marker.directions}
             pinColor="red"
-          />
+          >
+            <Callout>
+              <CustomCallout title={marker.name} description={marker.directions} />
+            </Callout>
+          </Marker>
         ))}
       </MapView>}
     </View>

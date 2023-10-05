@@ -22,7 +22,7 @@ export default function Map() {
   const [markers, setMarkers] = useState<DocumentData[]>([]);
   const [userLocation, setUserLocation] = useState<userLoc | null>(null)
 
-  const washroomsRef = collection(FIRESTORE_DB, 'washroom')
+  const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
 
   useEffect(() => {
     // Fetch data from Firestore and update markers state
@@ -84,6 +84,7 @@ export default function Map() {
             coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
             title={marker.name}
             description={marker.directions}
+            pinColor="red"
           />
         ))}
       </MapView>}

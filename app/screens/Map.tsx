@@ -88,7 +88,15 @@ export default function Map() {
             pinColor="red"
           >
             <Callout>
-              <CustomCallout title={marker.name} description={marker.directions} />
+              <CustomCallout 
+                title={marker.name} 
+                description={marker.directions} 
+                accessible={marker.accessible}
+                unisex={marker.unisex}
+                table={marker.changing_table}
+                upvote={marker.upvote}
+                downvote={marker.downvote}
+              />
             </Callout>
           </Marker>
         ))}

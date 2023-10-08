@@ -5,14 +5,7 @@ import { DocumentData, collection, doc, getDocs } from "firebase/firestore";
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import * as Location from 'expo-location';
 import CustomCallout from '../components/CustomCallout';
-
-interface MarkerData {
-  id: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-  directions: string;
-}
+import CustomPopup from '../components/CustomPopup';
 
 interface userLoc {
   latitude: number;
@@ -23,7 +16,30 @@ export default function Map() {
   const [markers, setMarkers] = useState<DocumentData[]>([]);
   const [userLocation, setUserLocation] = useState<userLoc | null>(null)
 
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState<{ title: string; description: string } | null>(null);
+
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
+
+  const showPopup = (
+    marker: { 
+      title: string;
+      description: string;
+      accessible?: any;
+      unisex?: boolean;
+      table?: boolean;
+      upvote?: number;
+      downvote?: number; 
+      comment?: string;
+    }) => {
+    setSelectedMarker(marker);
+    setPopupVisible(true);
+  };
+
+  const hidePopup = () => {
+    setSelectedMarker(null);
+    setPopupVisible(false);
+  };
 
   useEffect(() => {
     // Fetch data from Firestore and update markers state
@@ -87,7 +103,16 @@ export default function Map() {
             description={marker.directions}
             pinColor="red"
           >
-            <Callout>
+            <Callout onPress={() => showPopup({ 
+              title: marker.name,
+              description: marker.directions,
+              accessible: marker.accessible,
+              unisex: marker.unisex,
+              table: marker.changing_table,
+              upvote: marker.upvote,
+              downvote: marker.downvote,
+              comment: marker.comment
+            })}>
               <CustomCallout 
                 title={marker.name} 
                 description={marker.directions} 
@@ -101,6 +126,7 @@ export default function Map() {
           </Marker>
         ))}
       </MapView>}
+      <CustomPopup visible={popupVisible} onClose={hidePopup} markerData={selectedMarker || { title: '', description: '' }} />
     </View>
   );
 }

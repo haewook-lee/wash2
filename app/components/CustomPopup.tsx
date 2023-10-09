@@ -21,11 +21,12 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
     <Modal animationType="slide" transparent visible={visible}>
       <View style={styles.popupContainer}>
         <View style={styles.popupContent}>
-          <Text>{markerData.title}</Text>
-          <Text>{markerData.description}</Text>
-          <Text>{markerData.accessible}</Text>
-          <Text>{markerData.unisex}</Text>
-          <Text>{markerData.upvote}</Text>
+          <Text style={styles.title}>{markerData.title}</Text>
+          <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Accessible?</Text> {markerData.accessible ? `Yes` : `No`}</Text>
+          <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Unisex?</Text> {markerData.unisex ? `Yes` : `No`}</Text>
+          <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Changing Table?</Text> {markerData.table ? `Yes` : `No`}</Text>
+          {markerData.description && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Directions:</Text> {markerData.description}</Text>}
+          {markerData.comment && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Comments:</Text> {markerData.comment}</Text>}
           <Pressable onPress={onClose} style={styles.popupButton}>
             <Text style={styles.buttonText}>
                 Close
@@ -65,6 +66,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.25,
     color: 'white',
   },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 5,
+},
+description: {
+    fontSize: 14,
+    textAlign: 'left',
+    marginBottom: 3,
+},
 });
 
 export default CustomPopup;

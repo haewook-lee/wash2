@@ -4,7 +4,7 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import { DocumentData, collection, doc, getDocs } from "firebase/firestore"; 
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import * as Location from 'expo-location';
-import CustomCallout from '../components/CustomCallout';
+// import CustomCallout from '../components/CustomCallout';
 import CustomPopup from '../components/CustomPopup';
 
 interface userLoc {
@@ -100,10 +100,19 @@ export default function Map() {
             key={marker.id}
             coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
             title={marker.name}
-            description={marker.directions}
             pinColor="red"
+            onPress={() => showPopup({ 
+              title: marker.name,
+              description: marker.directions,
+              accessible: marker.accessible,
+              unisex: marker.unisex,
+              table: marker.changing_table,
+              upvote: marker.upvote,
+              downvote: marker.downvote,
+              comment: marker.comment
+            })}
           >
-            <Callout onPress={() => showPopup({ 
+            {/* <Callout onPress={() => showPopup({ 
               title: marker.name,
               description: marker.directions,
               accessible: marker.accessible,
@@ -122,7 +131,7 @@ export default function Map() {
                 upvote={marker.upvote}
                 downvote={marker.downvote}
               />
-            </Callout>
+            </Callout> */}
           </Marker>
         ))}
       </MapView>}

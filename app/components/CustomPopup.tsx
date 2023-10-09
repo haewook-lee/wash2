@@ -19,19 +19,21 @@ interface CustomPopupProps {
 const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData }) => {
   return (
     <Modal animationType="slide" transparent visible={visible}>
-      <View style={styles.popupContainer}>
-        <View style={styles.popupContent}>
-          <Text style={styles.title}>{markerData.title}</Text>
-          <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Accessible?</Text> {markerData.accessible ? `Yes` : `No`}</Text>
-          <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Unisex?</Text> {markerData.unisex ? `Yes` : `No`}</Text>
-          <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Changing Table?</Text> {markerData.table ? `Yes` : `No`}</Text>
-          {markerData.description && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Directions:</Text> {markerData.description}</Text>}
-          {markerData.comment && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Comments:</Text> {markerData.comment}</Text>}
-          <Pressable onPress={onClose} style={styles.popupButton}>
-            <Text style={styles.buttonText}>
-                Close
-            </Text>
-          </Pressable>
+      <View style={styles.popupBg}>
+        <View style={styles.popupContainer}>
+            <View style={styles.popupContent}>
+            <Text style={styles.title}>{markerData.title}</Text>
+            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Accessible?</Text> {markerData.accessible ? `Yes` : `No`}</Text>
+            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Unisex?</Text> {markerData.unisex ? `Yes` : `No`}</Text>
+            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Changing Table?</Text> {markerData.table ? `Yes` : `No`}</Text>
+            {markerData.description && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Directions:</Text> {markerData.description}</Text>}
+            {markerData.comment && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Comments:</Text> {markerData.comment}</Text>}
+            <Pressable onPress={onClose} style={styles.popupButton}>
+                <Text style={styles.buttonText}>
+                    Close
+                </Text>
+            </Pressable>
+            </View>
         </View>
       </View>
     </Modal>
@@ -39,6 +41,10 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
 };
 
 const styles = StyleSheet.create({
+  popupBg: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    height: '100%'
+  },
   popupContainer: {
     flex: 1,
     justifyContent: 'center',

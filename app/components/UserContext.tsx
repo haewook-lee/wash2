@@ -32,5 +32,4 @@ export const UserProvider = ({ children }: any) => {
   }, [])
 
   return <UserContext.Provider value={{user : user}}>{children}</UserContext.Provider>;
-//   return <UserContext.Provider value={{user : user}}>{children}</UserContext.Provider>;
 };

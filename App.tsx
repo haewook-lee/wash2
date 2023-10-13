@@ -33,7 +33,7 @@ export default function App() {
   return (
     <UserProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName={user ? 'Login' : 'Map'}>
+        <Stack.Navigator initialRouteName={user === undefined ? 'Login' : 'Map'}>
           <Stack.Screen
             name="Login"
             component={Login}

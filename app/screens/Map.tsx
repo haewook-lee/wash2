@@ -23,6 +23,8 @@ export default function Map() {
 
   const user = useUser()
 
+  console.log('map room', user?.user?.uid)
+
   const showPopup = (
     marker: { 
       title: string;

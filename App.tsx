@@ -9,7 +9,11 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 import { FIREBASE_AUTH } from './FirebaseConfig';
 import { useUser, UserProvider } from './app/components/UserContext'
 
-const Stack = createNativeStackNavigator()
+export type RootStackParamList = {
+  Login: undefined;
+  Map: undefined;
+}
+const Stack = createNativeStackNavigator<RootStackParamList>()
 
 const InsideStack = createNativeStackNavigator();
 
@@ -29,17 +33,18 @@ export default function App() {
   return (
     <UserProvider>
       <NavigationContainer>
-      <Stack.Navigator initialRouteName={user ? 'Inside' : 'Login'}>
-          <Stack.Screen
-            name="Inside"
-            component={InsideLayout}
-            options={{ headerShown: false }}
-          />
+        <Stack.Navigator initialRouteName={user ? 'Login' : 'Map'}>
           <Stack.Screen
             name="Login"
             component={Login}
             options={{ headerShown: false }}
           />
+          <Stack.Screen name="Map" component={Map} />
+          {/* <Stack.Screen
+            name="Inside"
+            component={InsideLayout}
+            options={{ headerShown: false }}
+          /> */}
           {/* <Stack.Screen name="Inside" component={InsideLayout} options={{ headerShown: false}} /> */}
         </Stack.Navigator>
       </NavigationContainer>

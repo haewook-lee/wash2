@@ -8,15 +8,15 @@ interface UserContextType {
   user: User | null;
 }
 
-// export const UserContext = createContext<UserContextType | undefined>(undefined);
-export const UserContext = createContext<any>('1');
+export const UserContext = createContext<UserContextType | undefined>(undefined);
+// export const UserContext = createContext<any>('1');
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (context === undefined) {
-    // throw new Error('useUser must be used within a UserProvider');
-    return 'hello world'
-  } 
+//   if (context === undefined) {
+//     // throw new Error('useUser must be used within a UserProvider');
+//     return 'hello world'
+//   } 
   return context;
 };
 
@@ -31,6 +31,6 @@ export const UserProvider = ({ children }: any) => {
     })
   }, [])
 
-  return <UserContext.Provider value={{user : 'hello'}}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{user : user}}>{children}</UserContext.Provider>;
 //   return <UserContext.Provider value={{user : user}}>{children}</UserContext.Provider>;
 };

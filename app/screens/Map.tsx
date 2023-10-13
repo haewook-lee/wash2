@@ -21,7 +21,7 @@ export default function Map() {
 
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
 
-  const { user } = useUser()
+  const user = useUser()
 
   const showPopup = (
     marker: { 
@@ -107,7 +107,7 @@ export default function Map() {
               id: marker.id
             })}
           >
-            <Text>{user ? user : 'no'}</Text>
+            {/* <Text>{user ? user : 'no'}</Text> */}
           </Marker>
         ))}
       </MapView>}

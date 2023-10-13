@@ -4,8 +4,8 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import { DocumentData, collection, doc, getDocs } from "firebase/firestore"; 
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import * as Location from 'expo-location';
-// import CustomCallout from '../components/CustomCallout';
 import CustomPopup from '../components/CustomPopup';
+import { useUser } from '../components/UserContext';
 
 interface userLoc {
   latitude: number;
@@ -21,6 +21,8 @@ export default function Map() {
 
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
 
+  const { user } = useUser()
+
   const showPopup = (
     marker: { 
       title: string;
@@ -31,6 +33,7 @@ export default function Map() {
       upvote?: number;
       downvote?: number; 
       comment?: string;
+      id?: number;
     }) => {
     setSelectedMarker(marker);
     setPopupVisible(true);
@@ -86,15 +89,6 @@ export default function Map() {
     <View style={styles.container}>
       {userLocation &&
       <MapView style={styles.map} initialRegion={{ latitude: userLocation.latitude, longitude: userLocation.longitude, latitudeDelta: 0.1, longitudeDelta: 0.1 }}>
-        {/* user marker */}
-        {/* <Marker
-            coordinate={{
-              latitude: userLocation.latitude,
-              longitude: userLocation.longitude,
-            }}
-            title="Your Location"
-            pinColor="blue"
-          /> */}
         {markers.map((marker) => (
           <Marker
             key={marker.id}
@@ -109,29 +103,11 @@ export default function Map() {
               table: marker.changing_table,
               upvote: marker.upvote,
               downvote: marker.downvote,
-              comment: marker.comment
+              comment: marker.comment,
+              id: marker.id
             })}
           >
-            {/* <Callout onPress={() => showPopup({ 
-              title: marker.name,
-              description: marker.directions,
-              accessible: marker.accessible,
-              unisex: marker.unisex,
-              table: marker.changing_table,
-              upvote: marker.upvote,
-              downvote: marker.downvote,
-              comment: marker.comment
-            })}>
-              <CustomCallout 
-                title={marker.name} 
-                description={marker.directions} 
-                accessible={marker.accessible}
-                unisex={marker.unisex}
-                table={marker.changing_table}
-                upvote={marker.upvote}
-                downvote={marker.downvote}
-              />
-            </Callout> */}
+            <Text>{user ? user : 'no'}</Text>
           </Marker>
         ))}
       </MapView>}

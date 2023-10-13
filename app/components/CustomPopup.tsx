@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, Button, StyleSheet, Pressable } from 'react-native';
+import firebase from 'firebase/app';
+import 'firebase/firestore'
+import { FIREBASE_AUTH } from '../../FirebaseConfig'
 
 interface CustomPopupProps {
   visible: boolean;
@@ -12,11 +15,24 @@ interface CustomPopupProps {
     table?: boolean;
     upvote?: number;
     downvote?: number;
-    comment?: string
+    comment?: string;
+    id?: number;
   };
 }
 
 const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData }) => {
+  const [userVoted, setUserVoted] = useState(false)
+
+  const auth = FIREBASE_AUTH
+
+  const checkUserVote = async () => {
+    // const userId = firebase.auth().currentUser?.uid
+  }
+
+  useEffect(() => {
+    checkUserVote()
+  })
+
   return (
     <Modal animationType="slide" transparent visible={visible}>
       <View style={styles.popupBg}>

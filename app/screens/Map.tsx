@@ -17,7 +17,7 @@ export default function Map() {
   const [userLocation, setUserLocation] = useState<userLoc | null>(null)
 
   const [popupVisible, setPopupVisible] = useState(false);
-  const [selectedMarker, setSelectedMarker] = useState<{ title: string; description: string } | null>(null);
+  const [selectedMarker, setSelectedMarker] = useState<{ title: string; description: string; id: string } | null>(null);
 
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
 
@@ -35,7 +35,7 @@ export default function Map() {
       upvote?: number;
       downvote?: number; 
       comment?: string;
-      id?: number;
+      id: string;
     }) => {
     setSelectedMarker(marker);
     setPopupVisible(true);
@@ -113,7 +113,7 @@ export default function Map() {
           </Marker>
         ))}
       </MapView>}
-      <CustomPopup visible={popupVisible} onClose={hidePopup} markerData={selectedMarker || { title: '', description: '' }} />
+      <CustomPopup visible={popupVisible} onClose={hidePopup} markerData={selectedMarker || { title: '', description: '', id: '' }} />
     </View>
   );
 }

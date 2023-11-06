@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, Button, StyleSheet, Pressable } from 'react-native';
 import firebase from 'firebase/app';
 import 'firebase/firestore'
-import { FIREBASE_AUTH } from '../../FirebaseConfig'
-
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig'
+import { useUser } from './UserContext';
+import { DocumentData, collection, doc, getDocs, getDoc } from "firebase/firestore"; 
 interface CustomPopupProps {
   visible: boolean;
   onClose: () => void;
@@ -16,14 +17,19 @@ interface CustomPopupProps {
     upvote?: number;
     downvote?: number;
     comment?: string;
-    id?: number;
+    id: string;
   };
 }
 
 const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData }) => {
-  const [userVoted, setUserVoted] = useState(false)
+  // const [userVoted, setUserVoted] = useState(false)
 
-  const auth = FIREBASE_AUTH
+  // const auth = FIREBASE_AUTH
+
+  const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
+  const votesRef = collection(FIRESTORE_DB, 'votes')
+
+  const user = useUser()
 
   const checkUserVote = async () => {
     // const userId = firebase.auth().currentUser?.uid
@@ -32,6 +38,50 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
   useEffect(() => {
     checkUserVote()
   })
+
+    // Upvote a washroom
+  const upvoteWashroom = async (washroomId: string, userId?: string) => {
+    const voteDocRef = doc(votesRef, washroomId)
+    const docSnapshot = await getDoc(voteDocRef)
+    // const dat = docSnapshot.data()
+    console.log(docSnapshot.data()?.washroom)
+    // try {
+    //   const docSnapshot = await getDoc(voteDocRef)
+
+    //   if (docSnapshot.exists()) {
+    //     if (docSnapshot vote is the same) {
+    //       don't change anything
+    //     } else {
+    //       change it and make the update in the total votes
+    //     }
+    //   } else {
+    //     create the document, then change the washroom reference
+    //   }
+    // } catch (error) {
+    //   console.log('Error fetching document: ', error)
+    // }
+
+    // await washroomRef.update({
+    //   upvotes: firebase.firestore.FieldValue.increment(1),
+    // });
+  };
+
+  // Downvote a washroom
+  // const downvoteWashroom = async (washroomId: string, userId: string) => {
+  //   const db = firebase.firestore();
+
+  //   const voteRef = db.collection('votes').doc();
+  //   await voteRef.set({
+  //     userId,
+  //     washroomId,
+  //     vote: 'downvote',
+  //   });
+
+  //   const washroomRef = db.collection('washrooms').doc(washroomId);
+  //   await washroomRef.update({
+  //     downvotes: firebase.firestore.FieldValue.increment(1),
+  //   });
+  // };
 
   return (
     <Modal animationType="slide" transparent visible={visible}>
@@ -44,10 +94,20 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
             <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Changing Table?</Text> {markerData.table ? `Yes` : `No`}</Text>
             {markerData.description && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Directions:</Text> {markerData.description}</Text>}
             {markerData.comment && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Comments:</Text> {markerData.comment}</Text>}
+            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Upvote:</Text> 0</Text>
+            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Downvote:</Text> 0</Text>
+
+            {/* <Pressable onPress={() => upvoteWashroom(markerData.id, user?.user?.uid)} style={styles.popupButton}> */}
+            <Pressable onPress={() => upvoteWashroom('nVVn0E0XCtpRX1quYpq0')} style={styles.popupButton}>
+              <Text style={styles.buttonText}>
+                Test
+              </Text>
+            </Pressable>
+
             <Pressable onPress={onClose} style={styles.popupButton}>
-                <Text style={styles.buttonText}>
-                    Close
-                </Text>
+              <Text style={styles.buttonText}>
+                  Close
+              </Text>
             </Pressable>
             </View>
         </View>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, Button, StyleSheet, Pressable } from 'react-native';
-import firebase from 'firebase/app';
 import 'firebase/firestore'
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig'
 import { useUser } from './UserContext';
-import { DocumentData, collection, doc, getDocs, getDoc } from "firebase/firestore"; 
+import { collection, getDocs, query, where, addDoc } from "firebase/firestore"; 
+import { UserContextType } from './UserContext';
+
 interface CustomPopupProps {
   visible: boolean;
   onClose: () => void;
@@ -22,9 +23,6 @@ interface CustomPopupProps {
 }
 
 const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData }) => {
-  // const [userVoted, setUserVoted] = useState(false)
-
-  // const auth = FIREBASE_AUTH
 
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
   const votesRef = collection(FIRESTORE_DB, 'votes')
@@ -40,30 +38,30 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
   })
 
     // Upvote a washroom
-  const upvoteWashroom = async (washroomId: string, userId?: string) => {
-    const voteDocRef = doc(votesRef, washroomId)
-    const docSnapshot = await getDoc(voteDocRef)
-    // const dat = docSnapshot.data()
-    console.log(docSnapshot.data()?.washroom)
-    // try {
-    //   const docSnapshot = await getDoc(voteDocRef)
+  const upvoteWashroom = async (washroomId: string, userId?: UserContextType) => {
+    const q = query(votesRef, where('washroomId', '==', `${markerData.id}`), where('uid', '==', `${userId?.user?.uid}`))
+    // console.log(userId?.user?.uid, markerData.id, washroomId)
 
-    //   if (docSnapshot.exists()) {
-    //     if (docSnapshot vote is the same) {
-    //       don't change anything
-    //     } else {
-    //       change it and make the update in the total votes
-    //     }
-    //   } else {
-    //     create the document, then change the washroom reference
-    //   }
-    // } catch (error) {
-    //   console.log('Error fetching document: ', error)
-    // }
+    try {
+      const querySnapshot = await getDocs(q);
+  
+      if (!querySnapshot.empty) {
+        const matchingVote = querySnapshot.docs[0].data()
+        console.log('Matching vote:', matchingVote);
+      } else {
+        const newDoc = await addDoc(votesRef, {
+          washroomId: markerData.id,
+          uid: userId?.user?.uid,
+          vote: 'upvote'
+        })
 
-    // await washroomRef.update({
-    //   upvotes: firebase.firestore.FieldValue.increment(1),
-    // });
+        console.log('Document written with ID: ', newDoc.id)
+
+        // update the washroom upvotes/downvotes
+      }
+    } catch (error) {
+      console.error('Error querying documents:', error);
+    }
   };
 
   // Downvote a washroom
@@ -98,9 +96,14 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
             <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Downvote:</Text> 0</Text>
 
             {/* <Pressable onPress={() => upvoteWashroom(markerData.id, user?.user?.uid)} style={styles.popupButton}> */}
-            <Pressable onPress={() => upvoteWashroom('nVVn0E0XCtpRX1quYpq0')} style={styles.popupButton}>
+            <Pressable onPress={() => upvoteWashroom('nVVn0E0XCtpRX1quYpq0', user)} style={styles.popupButton}>
               <Text style={styles.buttonText}>
-                Test
+                Upvote
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => upvoteWashroom('nVVn0E0XCtpRX1quYpq0', user)} style={styles.popupButton}>
+              <Text style={styles.buttonText}>
+                Downvote
               </Text>
             </Pressable>
 

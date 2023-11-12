@@ -4,7 +4,7 @@ import 'firebase/auth';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 
-interface UserContextType {
+export interface UserContextType {
   user: User | null;
 }
 

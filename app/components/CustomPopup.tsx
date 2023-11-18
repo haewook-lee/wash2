@@ -38,9 +38,9 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
   })
 
     // Upvote a washroom
-  const upvoteWashroom = async (washroomId: string, userId?: UserContextType) => {
-    const q = query(votesRef, where('washroomId', '==', `${markerData.id}`), where('uid', '==', `${userId?.user?.uid}`))
-    // console.log(userId?.user?.uid, markerData.id, washroomId)
+  const upvoteWashroom = async (userId?: UserContextType) => {
+    const q = query(votesRef, where('washroomId', '==', markerData.id), where('uid', '==', `${userId?.user?.uid}`))
+    console.log(userId?.user?.uid, markerData.id)
 
     try {
       const querySnapshot = await getDocs(q);
@@ -65,21 +65,31 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
   };
 
   // Downvote a washroom
-  // const downvoteWashroom = async (washroomId: string, userId: string) => {
-  //   const db = firebase.firestore();
+  const downvoteWashroom = async (userId?: UserContextType) => {
+    const q = query(votesRef, where('washroomId', '==', markerData.id), where('uid', '==', `${userId?.user?.uid}`))
+    console.log(userId?.user?.uid, markerData.id)
 
-  //   const voteRef = db.collection('votes').doc();
-  //   await voteRef.set({
-  //     userId,
-  //     washroomId,
-  //     vote: 'downvote',
-  //   });
+    try {
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const matchingVote = querySnapshot.docs[0].data()
+        console.log('Matching vote:', matchingVote);
+      } else {
+        const newDoc = await addDoc(votesRef, {
+          washroomId: markerData.id,
+          uid: userId?.user?.uid,
+          vote: 'downvote'
+        })
 
-  //   const washroomRef = db.collection('washrooms').doc(washroomId);
-  //   await washroomRef.update({
-  //     downvotes: firebase.firestore.FieldValue.increment(1),
-  //   });
-  // };
+        console.log('Document written with ID: ', newDoc.id)
+
+        // update the washroom upvotes/downvotes
+      }
+    } catch (error) {
+      console.error('Error querying documents:', error);
+    }
+  };
 
   return (
     <Modal animationType="slide" transparent visible={visible}>
@@ -95,13 +105,12 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
             <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Upvote:</Text> 0</Text>
             <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Downvote:</Text> 0</Text>
 
-            {/* <Pressable onPress={() => upvoteWashroom(markerData.id, user?.user?.uid)} style={styles.popupButton}> */}
-            <Pressable onPress={() => upvoteWashroom('nVVn0E0XCtpRX1quYpq0', user)} style={styles.popupButton}>
+            <Pressable onPress={() => upvoteWashroom(user)} style={styles.popupButton}>
               <Text style={styles.buttonText}>
                 Upvote
               </Text>
             </Pressable>
-            <Pressable onPress={() => upvoteWashroom('nVVn0E0XCtpRX1quYpq0', user)} style={styles.popupButton}>
+            <Pressable onPress={() => downvoteWashroom(user)} style={styles.popupButton}>
               <Text style={styles.buttonText}>
                 Downvote
               </Text>

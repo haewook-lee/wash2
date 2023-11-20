@@ -3,7 +3,7 @@ import { View, Text, Modal, Button, StyleSheet, Pressable } from 'react-native';
 import 'firebase/firestore'
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig'
 import { useUser } from './UserContext';
-import { collection, getDocs, query, where, addDoc } from "firebase/firestore"; 
+import { collection, getDocs, query, where, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore"; 
 import { UserContextType } from './UserContext';
 
 interface CustomPopupProps {
@@ -47,7 +47,20 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
   
       if (!querySnapshot.empty) {
         const matchingVote = querySnapshot.docs[0].data()
-        console.log('Matching vote:', matchingVote);
+        console.log('Matching vote:', matchingVote, querySnapshot.docs[0].id);
+        const docRef = doc(votesRef, querySnapshot.docs[0].id)
+
+        if(matchingVote.vote === 'upvote'){
+          
+          await deleteDoc(docRef)
+
+        } else if(matchingVote.vote === 'downvote') {
+
+          await updateDoc(docRef, {
+            vote: 'upvote'
+          })
+
+        }
       } else {
         const newDoc = await addDoc(votesRef, {
           washroomId: markerData.id,
@@ -71,10 +84,24 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
 
     try {
       const querySnapshot = await getDocs(q);
-      
+
       if (!querySnapshot.empty) {
         const matchingVote = querySnapshot.docs[0].data()
         console.log('Matching vote:', matchingVote);
+
+        const docRef = doc(votesRef, querySnapshot.docs[0].id)
+
+        if(matchingVote.vote === 'downvote'){
+          
+          await deleteDoc(docRef)
+
+        } else if(matchingVote.vote === 'upvote') {
+
+          await updateDoc(docRef, {
+            vote: 'downvote'
+          })
+          
+        }
       } else {
         const newDoc = await addDoc(votesRef, {
           washroomId: markerData.id,

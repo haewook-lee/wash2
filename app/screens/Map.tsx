@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { DocumentData, collection, doc, getDocs } from "firebase/firestore"; 
+import { DocumentData, collection, doc, getDocs, onSnapshot, query } from "firebase/firestore"; 
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import * as Location from 'expo-location';
 import CustomPopup from '../components/CustomPopup';
@@ -13,11 +13,11 @@ interface userLoc {
 }
 
 export default function Map() {
-  const [markers, setMarkers] = useState<DocumentData[]>([]);
+  let [markers, setMarkers] = useState<DocumentData[]>([]);
   const [userLocation, setUserLocation] = useState<userLoc | null>(null)
 
   const [popupVisible, setPopupVisible] = useState(false);
-  const [selectedMarker, setSelectedMarker] = useState<{ title: string; description: string; id: string } | null>(null);
+  let [selectedMarker, setSelectedMarker] = useState<{ title: string; description: string; id: string } | null>(null);
 
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
 
@@ -25,7 +25,7 @@ export default function Map() {
 
   console.log('map room', user?.user?.uid)
 
-  const showPopup = (
+  let showPopup = (
     marker: { 
       title: string;
       description: string;
@@ -58,6 +58,16 @@ export default function Map() {
         }))
 
         setMarkers(data);
+
+        const updateSnapshot = onSnapshot(washroomsRef, (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if(change.type === "modified"){
+              console.log('Modified marker: ', change.doc.data())
+            }
+          })
+        })
+
+        updateSnapshot
       } catch (error) {
         console.error('Error fetching data from Firestore:', error);
       }

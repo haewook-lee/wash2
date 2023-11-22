@@ -3,7 +3,7 @@ import { View, Text, Modal, Button, StyleSheet, Pressable } from 'react-native';
 import 'firebase/firestore'
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../FirebaseConfig'
 import { useUser } from './UserContext';
-import { collection, getDocs, query, where, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore"; 
+import { collection, getDocs, query, where, addDoc, deleteDoc, doc, updateDoc, FieldValue, increment } from "firebase/firestore"; 
 import { UserContextType } from './UserContext';
 
 interface CustomPopupProps {
@@ -23,43 +23,50 @@ interface CustomPopupProps {
 }
 
 const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData }) => {
+  // let [upvote, setUpvote] = useState(markerData.upvote)
+  // let [downvote, setDownvote] = useState(markerData.downvote)
 
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
   const votesRef = collection(FIRESTORE_DB, 'votes')
 
+  const w = query(washroomsRef, where('id', '==', markerData.id))
+
   const user = useUser()
 
-  const checkUserVote = async () => {
-    // const userId = firebase.auth().currentUser?.uid
-  }
-
-  useEffect(() => {
-    checkUserVote()
-  })
-
-    // Upvote a washroom
+  // Upvote a washroom
   const upvoteWashroom = async (userId?: UserContextType) => {
-    const q = query(votesRef, where('washroomId', '==', markerData.id), where('uid', '==', `${userId?.user?.uid}`))
+    const q = query(votesRef, where('washroomId', '==', markerData.id), where('uid', '==', userId?.user?.uid))
+
     console.log(userId?.user?.uid, markerData.id)
 
     try {
       const querySnapshot = await getDocs(q);
+      const washroomSnapshot = await getDocs(w)
+      const washRef = doc(washroomsRef, washroomSnapshot.docs[0].id)
+      console.log('hi', washRef)
   
       if (!querySnapshot.empty) {
         const matchingVote = querySnapshot.docs[0].data()
         console.log('Matching vote:', matchingVote, querySnapshot.docs[0].id);
         const docRef = doc(votesRef, querySnapshot.docs[0].id)
+        
 
         if(matchingVote.vote === 'upvote'){
-          
           await deleteDoc(docRef)
 
+          await updateDoc(washRef, {
+            upvote: increment(-1)
+          })
+          
         } else if(matchingVote.vote === 'downvote') {
-
           await updateDoc(docRef, {
             vote: 'upvote'
           })
 
+          // await updateDoc(washRef, {
+          //   upvote: increment(1),
+          //   downvote: increment(-1)
+          // })
         }
       } else {
         const newDoc = await addDoc(votesRef, {
@@ -68,9 +75,11 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
           vote: 'upvote'
         })
 
-        console.log('Document written with ID: ', newDoc.id)
+        await updateDoc(washRef, {
+          upvote: increment(1)
+        })
 
-        // update the washroom upvotes/downvotes
+        console.log('Document written with ID: ', newDoc.id)
       }
     } catch (error) {
       console.error('Error querying documents:', error);
@@ -92,15 +101,13 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
         const docRef = doc(votesRef, querySnapshot.docs[0].id)
 
         if(matchingVote.vote === 'downvote'){
-          
           await deleteDoc(docRef)
 
         } else if(matchingVote.vote === 'upvote') {
-
           await updateDoc(docRef, {
             vote: 'downvote'
           })
-          
+
         }
       } else {
         const newDoc = await addDoc(votesRef, {
@@ -110,8 +117,6 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
         })
 
         console.log('Document written with ID: ', newDoc.id)
-
-        // update the washroom upvotes/downvotes
       }
     } catch (error) {
       console.error('Error querying documents:', error);
@@ -129,8 +134,8 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
             <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Changing Table?</Text> {markerData.table ? `Yes` : `No`}</Text>
             {markerData.description && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Directions:</Text> {markerData.description}</Text>}
             {markerData.comment && <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Comments:</Text> {markerData.comment}</Text>}
-            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Upvote:</Text> 0</Text>
-            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Downvote:</Text> 0</Text>
+            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Upvote:</Text> {markerData.upvote}</Text>
+            <Text style={styles.description}><Text style={{fontWeight: 'bold'}}>Downvote:</Text> {markerData.downvote}</Text>
 
             <Pressable onPress={() => upvoteWashroom(user)} style={styles.popupButton}>
               <Text style={styles.buttonText}>

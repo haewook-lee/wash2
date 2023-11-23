@@ -63,6 +63,14 @@ export default function Map() {
           snapshot.docChanges().forEach((change) => {
             if(change.type === "modified"){
               console.log('Modified marker: ', change.doc.data())
+              
+              const modifiedMarker = change.doc.data()
+
+              const updatedMarkers = markers.map(marker =>
+                marker.id === modifiedMarker.id ? modifiedMarker : marker
+              );
+        
+              setMarkers(updatedMarkers);
             }
           })
         })

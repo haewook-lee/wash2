@@ -84,6 +84,8 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
     } catch (error) {
       console.error('Error querying documents:', error);
     }
+
+    onClose()
   };
 
   // Downvote a washroom
@@ -121,6 +123,8 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
     } catch (error) {
       console.error('Error querying documents:', error);
     }
+
+    onClose()
   };
 
   return (

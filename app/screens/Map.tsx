@@ -62,7 +62,7 @@ export default function Map() {
         const updateSnapshot = onSnapshot(washroomsRef, (snapshot) => {
           snapshot.docChanges().forEach((change) => {
             if(change.type === "modified"){
-              console.log('Modified marker: ', change.doc.data())
+              // console.log('Modified marker: ', change.doc.data())
               
               const modifiedMarker = change.doc.data()
 

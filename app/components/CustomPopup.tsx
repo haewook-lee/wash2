@@ -23,8 +23,6 @@ interface CustomPopupProps {
 }
 
 const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData }) => {
-  // let [upvote, setUpvote] = useState(markerData.upvote)
-  // let [downvote, setDownvote] = useState(markerData.downvote)
 
   const washroomsRef = collection(FIRESTORE_DB, 'washrooms')
   const votesRef = collection(FIRESTORE_DB, 'votes')
@@ -37,17 +35,16 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
   const upvoteWashroom = async (userId?: UserContextType) => {
     const q = query(votesRef, where('washroomId', '==', markerData.id), where('uid', '==', userId?.user?.uid))
 
-    console.log(userId?.user?.uid, markerData.id)
+    // console.log(userId?.user?.uid, markerData.id)
 
     try {
       const querySnapshot = await getDocs(q);
       const washroomSnapshot = await getDocs(w)
       const washRef = doc(washroomsRef, washroomSnapshot.docs[0].id)
-      console.log('hi', washRef)
   
       if (!querySnapshot.empty) {
         const matchingVote = querySnapshot.docs[0].data()
-        console.log('Matching vote:', matchingVote, querySnapshot.docs[0].id);
+        // console.log('Matching vote:', matchingVote, querySnapshot.docs[0].id);
         const docRef = doc(votesRef, querySnapshot.docs[0].id)
         
 
@@ -63,10 +60,10 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
             vote: 'upvote'
           })
 
-          // await updateDoc(washRef, {
-          //   upvote: increment(1),
-          //   downvote: increment(-1)
-          // })
+          await updateDoc(washRef, {
+            upvote: increment(1),
+            downvote: increment(-1)
+          })
         }
       } else {
         const newDoc = await addDoc(votesRef, {
@@ -79,7 +76,7 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
           upvote: increment(1)
         })
 
-        console.log('Document written with ID: ', newDoc.id)
+        // console.log('Document written with ID: ', newDoc.id)
       }
     } catch (error) {
       console.error('Error querying documents:', error);
@@ -91,25 +88,34 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
   // Downvote a washroom
   const downvoteWashroom = async (userId?: UserContextType) => {
     const q = query(votesRef, where('washroomId', '==', markerData.id), where('uid', '==', `${userId?.user?.uid}`))
-    console.log(userId?.user?.uid, markerData.id)
+    // console.log(userId?.user?.uid, markerData.id)
 
     try {
       const querySnapshot = await getDocs(q);
+      const washroomSnapshot = await getDocs(w)
+      const washRef = doc(washroomsRef, washroomSnapshot.docs[0].id)
 
       if (!querySnapshot.empty) {
         const matchingVote = querySnapshot.docs[0].data()
-        console.log('Matching vote:', matchingVote);
-
+        // console.log('Matching vote:', matchingVote);
         const docRef = doc(votesRef, querySnapshot.docs[0].id)
 
         if(matchingVote.vote === 'downvote'){
           await deleteDoc(docRef)
+
+          await updateDoc(washRef, {
+            downvote: increment(-1)
+          })
 
         } else if(matchingVote.vote === 'upvote') {
           await updateDoc(docRef, {
             vote: 'downvote'
           })
 
+          await updateDoc(washRef, {
+            upvote: increment(-1),
+            downvote: increment(1)
+          })
         }
       } else {
         const newDoc = await addDoc(votesRef, {
@@ -118,7 +124,11 @@ const CustomPopup: React.FC<CustomPopupProps> = ({ visible, onClose, markerData 
           vote: 'downvote'
         })
 
-        console.log('Document written with ID: ', newDoc.id)
+        await updateDoc(washRef, {
+          downvote: increment(1)
+        })
+
+        // console.log('Document written with ID: ', newDoc.id)
       }
     } catch (error) {
       console.error('Error querying documents:', error);

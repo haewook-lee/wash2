@@ -65,17 +65,19 @@ export default function Map() {
               // console.log('Modified marker: ', change.doc.data())
               
               const modifiedMarker = change.doc.data()
+              // console.log(modifiedMarker)
+              // console.log(markers)
 
               const updatedMarkers = markers.map(marker =>
                 marker.id === modifiedMarker.id ? modifiedMarker : marker
               );
+
+              // console.log('ayy', updatedMarkers)
         
               setMarkers(updatedMarkers);
             }
           })
         })
-
-        updateSnapshot
       } catch (error) {
         console.error('Error fetching data from Firestore:', error);
       }

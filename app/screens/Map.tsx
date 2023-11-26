@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, Button } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { DocumentData, collection, doc, getDocs, onSnapshot, query } from "firebase/firestore"; 
 import { FIRESTORE_DB } from '../../FirebaseConfig';
 import * as Location from 'expo-location';
 import CustomPopup from '../components/CustomPopup';
 import { useUser } from '../components/UserContext';
+import RoundedButton from '../components/RoundedButton';
 
 interface userLoc {
   latitude: number;
@@ -133,6 +134,23 @@ export default function Map() {
           </Marker>
         ))}
       </MapView>}
+
+      <View style={{ 
+        position: 'absolute', 
+        top: 20, 
+        left: 10, 
+        right: 10, 
+        flexDirection: 'row', 
+        justifyContent: 'space-around', 
+        backgroundColor: 'transparent',
+        borderRadius: 10 
+        }}
+      >
+        <RoundedButton onPress={() => null} title="Accessible" />
+        <RoundedButton onPress={() => null} title="Changing Tables" />
+        <RoundedButton onPress={() => null} title="Unisex" />
+      </View>
+
       <CustomPopup visible={popupVisible} onClose={hidePopup} markerData={selectedMarker || { title: '', description: '', id: '' }} />
     </View>
   );

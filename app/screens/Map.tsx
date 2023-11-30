@@ -15,6 +15,8 @@ interface userLoc {
 
 export default function Map() {
   let [markers, setMarkers] = useState<DocumentData[]>([]);
+  let [filteredMarkers, setFilteredMarkers] = useState<DocumentData[]>([])
+  let [selectedFilters, setSelectedFilters] = useState<string[]>([])
   const [userLocation, setUserLocation] = useState<userLoc | null>(null)
 
   const [popupVisible, setPopupVisible] = useState(false);
@@ -59,22 +61,26 @@ export default function Map() {
         }))
 
         setMarkers(data);
+        setFilteredMarkers(data)
 
         const updateSnapshot = onSnapshot(washroomsRef, (snapshot) => {
           snapshot.docChanges().forEach((change) => {
             if(change.type === "modified"){
-              // console.log('Modified marker: ', change.doc.data())
               
               const modifiedMarker = change.doc.data()
-              // console.log(modifiedMarker)
-              // console.log(markers)
 
+              // updated filtered markers
+              const updatedFilteredMarkers = filteredMarkers.map(marker => 
+                marker.id === modifiedMarker.id ? modifiedMarker : marker
+              )
+
+              setFilteredMarkers(updatedFilteredMarkers)
+
+              // updated markers
               const updatedMarkers = markers.map(marker =>
                 marker.id === modifiedMarker.id ? modifiedMarker : marker
               );
 
-              // console.log('ayy', updatedMarkers)
-        
               setMarkers(updatedMarkers);
             }
           })
@@ -108,11 +114,30 @@ export default function Map() {
     })();
   }, []);
 
+  useEffect(() => {
+    if(selectedFilters.length === 0){
+      setFilteredMarkers(markers)
+    } else {
+      let filtered = markers.filter((marker) => {
+        return selectedFilters.every((filter) => marker[filter])
+      });
+      setFilteredMarkers(filtered);
+    }
+  }, [selectedFilters, markers])
+
+  const handleFilter = (property: string) => {
+    const updatedFilters = selectedFilters.includes(property)
+      ? selectedFilters.filter((filter) => filter !== property)
+      : [...selectedFilters, property];
+
+    setSelectedFilters(updatedFilters);
+  };
+
   return (
     <View style={styles.container}>
       {userLocation &&
       <MapView style={styles.map} initialRegion={{ latitude: userLocation.latitude, longitude: userLocation.longitude, latitudeDelta: 0.1, longitudeDelta: 0.1 }}>
-        {markers.map((marker) => (
+        {filteredMarkers.map((marker) => (
           <Marker
             key={marker.id}
             coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
@@ -129,9 +154,7 @@ export default function Map() {
               comment: marker.comment,
               id: marker.id
             })}
-          >
-            {/* <Text>{user ? user : 'no'}</Text> */}
-          </Marker>
+          />
         ))}
       </MapView>}
 
@@ -146,9 +169,9 @@ export default function Map() {
         borderRadius: 10 
         }}
       >
-        <RoundedButton onPress={() => null} title="Accessible" />
-        <RoundedButton onPress={() => null} title="Changing Tables" />
-        <RoundedButton onPress={() => null} title="Unisex" />
+        <RoundedButton onPress={() => handleFilter('accessible')} title="Accessible" />
+        <RoundedButton onPress={() => handleFilter('changing_table')} title="Changing Tables" />
+        <RoundedButton onPress={() => handleFilter('unisex')} title="Unisex" />
       </View>
 
       <CustomPopup visible={popupVisible} onClose={hidePopup} markerData={selectedMarker || { title: '', description: '', id: '' }} />

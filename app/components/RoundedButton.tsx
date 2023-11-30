@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 
 interface CustomButtonProps {
-    onPress: () => void
+    onPress: any
     title: string
 }
 

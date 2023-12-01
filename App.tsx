@@ -4,12 +4,14 @@ import Login from './app/screens/Login'
 import List from './app/screens/List';
 import Details from './app/screens/Details';
 import Map from './app/screens/Map';
+import Splash from './app/screens/Splash';
 import { useEffect, useState } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { FIREBASE_AUTH } from './FirebaseConfig';
 import { useUser, UserProvider } from './app/components/UserContext'
 
 export type RootStackParamList = {
+  Splash: undefined;
   Login: undefined;
   Map: undefined;
 }
@@ -33,13 +35,14 @@ export default function App() {
   return (
     <UserProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName={user === undefined ? 'Login' : 'Map'}>
+        <Stack.Navigator initialRouteName='Splash'>
+          <Stack.Screen name="Splash" component={Splash} options={{ headerShown: false }} />
           <Stack.Screen
             name="Login"
             component={Login}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="Map" component={Map} />
+          <Stack.Screen name="Map" component={Map} options={{ headerShown: false }}/>
           {/* <Stack.Screen
             name="Inside"
             component={InsideLayout}
